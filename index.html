@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>모바일 갈라가 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>    <div id="game-container">
+        <canvas id="game-canvas"></canvas>        <div id="top-menu">
+            <div id="timer" class="hidden">60</div>
+            <button id="menu-start">START</button>
+            <button id="menu-pause">PAUSE</button>
+            <button id="menu-stop">STOP</button>
+        </div>        <div id="start-screen">
+            <button id="start-button" class="play-button">▶</button>
+        </div>        <div id="game-over-screen" class="hidden">
+            <h1>게임 오버</h1>
+            <p>⭐ <span id="final-score">0</span></p>
+            <button id="restart-button">다시 시작</button>
+        </div>        <div id="game-ui" class="hidden">
+        </div>
+        <div id="mobile-controls" class="hidden">
+            <button id="left-button">◀</button>
+            <button id="fire-button">🔥</button>
+            <button id="right-button">▶</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
