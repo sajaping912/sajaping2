@@ -42,8 +42,8 @@ canvas {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* 수직 중앙 정렬 */
+    align-items: center; /* 수평 중앙 정렬 */
     color: white;
     background-image: radial-gradient(circle, rgba(25, 25, 50, 0.7) 0%, rgba(0, 0, 0, 0.8) 100%);
 }
@@ -87,29 +87,27 @@ button {
 }
 
 .play-button {
-    width: 110px;  /* 물방울 이미지 크기에 맞게 조정 */
-    height: 110px; /* 물방울 이미지 크기에 맞게 조정 */
-    border-radius: 50%;    font-size: 2.5rem; /* 삼각형 아이콘 크기 조정 */
+    width: 92.4px;  /* 84px * 1.1 = 92.4px (10% 증가) */
+    height: 92.4px; /* 84px * 1.1 = 92.4px (10% 증가) */
+    border-radius: 50%;
+    font-size: 2.25rem; /* 3.2rem * 0.7 ~= 2.25rem (30% 감소) */
     padding: 0;
-    display: flex;
-    justify-content: center;
+    position: relative; /* 상대 위치 지정을 위해 추가 */    display: flex;    justify-content: center;
     align-items: center;
-    transform: translateX(-2px); /* 삼각형을 x축으로 좌측으로 2px만 이동 (1px 추가로 우측 이동) */
-    background-color: transparent;    background-image: url('images/removebg.png'); /* 물방울 배경 추가 */
-    background-size: contain; /* 이미지 크기를 버튼에 맞게 조정 */
-    background-repeat: no-repeat; /* 이미지 반복 없음 */
-    background-position: calc(50% + 4px) 50%; /* 물방울을 x축으로 우측으로 4px 이동 */
-    color: #006400; /* 짙은 녹색(다크 그린)으로 변경 */
-    text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.9), 0px 0px 2px rgba(0, 130, 0, 0.7); /* 텍스트에 그림자 효과 */    border: none;
+    background-color: transparent;color: #22cc22;
+    border: none;
     transition: transform 0.2s ease;
-    margin-top: 9px; /* 삼각형이 물방울 안에 더 잘 위치하도록 아래로 9px 조정 (4px 추가 이동) */
-    position: relative; /* 위치 조정을 위한 relative 설정 */
+    background-image: url('images/removebg.png');
+    background-size: contain;
+    background-repeat: no-repeat;    background-position: calc(50% - 2px) center; /* 배경 이미지를 X축으로 2px 왼쪽으로 이동 */
+    text-align: center;
+    line-height: 92.4px; /* 늘어난 물방울 크기에 맞게 조정 */
+    position: relative; /* 포지션 설정 추가 */
+    padding: 0; /* 기존 패딩 제거 */
 }
 
 .play-button:active {
-    transform: scale(0.8); /* 클릭시 더 작게 축소되도록 조정 */
-    color: #004d00; /* 활성화 시 더 짙은 녹색으로 변경 */
-    text-shadow: 0px 0px 6px rgba(255, 255, 255, 1); /* 클릭 시 더 강한 발광 효과 */
+    transform: scale(0.9);
 }
 
 button:active {
@@ -161,6 +159,8 @@ button:active {
 #top-menu button {
     width: auto;
     min-width: 80px;
+    position: relative;
+    left: 3px; /* 메뉴 버튼들을 X축으로 3px 오른쪽으로 이동 */
     height: 40px;
     padding: 0 12px;
     margin: 0 1rem;    
