@@ -7,9 +7,9 @@ const ctx = canvas.getContext('2d');
 const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const gameUI = document.getElementById('game-ui');
-const mobileControls = document.getElementById('mobile-controls');
+// mobileControls 요소는 HTML에서 제거되어 참조하지 않음
 const timerDisplay = document.getElementById('timer');
-const finalScoreDisplay = document.getElementById('final-score');
+// finalScoreDisplay 요소는 HTML에서 제거되어 참조하지 않음 
 const menuStart = document.getElementById('menu-start');
 const menuPause = document.getElementById('menu-pause');
 const menuStop = document.getElementById('menu-stop');
@@ -76,15 +76,8 @@ function resizeCanvas() {
     if (player) {
         player.x = gameWidth / 2 - player.width / 2;
         player.y = gameHeight - player.height - 20;
-    }
-
-    isMobile = detectMobile();
-    
-    if (isMobile && gameRunning) {
-        mobileControls.classList.remove('hidden');
-    } else {
-        mobileControls.classList.add('hidden');
-    }
+    }    isMobile = detectMobile();
+    // 모바일 컨트롤 사용하지 않음
 }
 
 // 플레이어 클래스
@@ -254,13 +247,8 @@ function initGame() {    gameRunning = true;
     explosions = [];    player = new Player();
     timerDisplay.textContent = `60`; // 1분 타이머 표시 (60초)
     timerDisplay.classList.remove('hidden'); // 타이머 표시
-    
-    startScreen.classList.add('hidden');
+      startScreen.classList.add('hidden');
     gameOverScreen.classList.add('hidden');
-    
-    if (isMobile) {
-        mobileControls.classList.remove('hidden');
-    }
     
     backgroundSound.currentTime = 0;
     backgroundSound.play().catch(e => console.log("배경 음악 재생 에러:", e));
@@ -273,22 +261,11 @@ function endGame() {
     gameRunning = false;
     gamePaused = false;
     backgroundSound.pause();
-    
-    // PAUSE 버튼 텍스트 초기화
+      // PAUSE 버튼 텍스트 초기화
     menuPause.textContent = "PAUSE";
     
-    // 점수 표시
-    finalScoreDisplay.textContent = score;
-    
-    // 게임 오버 화면 제목 변경 (1분이 지났는지 확인)
-    const gameOverTitle = gameOverScreen.querySelector('h1');
-    if (gameTime >= 60) {
-        gameOverTitle.textContent = '시간 종료!';
-    } else {
-        gameOverTitle.textContent = '게임 오버';
-    }
-      timerDisplay.classList.add('hidden');
-    mobileControls.classList.add('hidden');
+    // 타이머 숨기기 및 게임 종료 화면 표시 (플레이 버튼만 있는 화면)
+    timerDisplay.classList.add('hidden');
     gameOverScreen.classList.remove('hidden');
 }
 
@@ -331,16 +308,11 @@ function gameLoop(timestamp) {
     if (enemySpawnTimer >= enemySpawnInterval) {
         spawnEnemy();
         enemySpawnTimer = 0;
-    }
-
-    // 플레이어 업데이트 및 그리기
+    }    // 플레이어 업데이트 및 그리기
     player.update();
     player.draw();
     
-    // 지속적인 발사 처리
-    if (isShooting) {
-        player.shoot();
-    }
+    // 모바일에서는 자동 발사 처리 안함 (터치 시에만 발사)
     
     // 총알 업데이트 및 그리기
     bullets = bullets.filter(bullet => {
@@ -441,8 +413,25 @@ function handleMenuPauseClick() {
 function handleMenuStopClick() {
     console.log('STOP 버튼 클릭됨');
     if (gameRunning) {
-        endGame();
+        // 게임 종료 상태로 변경
+        gameRunning = false;
+        gamePaused = false;
+        backgroundSound.pause();
+        
+        // PAUSE 버튼 텍스트 초기화
+        menuPause.textContent = "PAUSE";
+        
+        // 게임 요소 숨기기
+        timerDisplay.classList.add('hidden');
+        
+        // 게임 오버 화면 대신 시작 화면(플레이 버튼)을 표시
         startScreen.classList.remove('hidden');
+        gameOverScreen.classList.add('hidden'); // 게임 오버 화면은 표시하지 않음
+        
+        // 모든 게임 객체 초기화
+        bullets = [];
+        enemies = [];
+        explosions = [];
     }
 }
 
@@ -495,41 +484,40 @@ window.addEventListener('keyup', (e) => {
     }
 });
 
-// 모바일 컨트롤 이벤트
-document.getElementById('left-button').addEventListener('touchstart', () => {
-    isMovingLeft = true;
-});
+// 모바일 컨트롤 이벤트 제거 - 대신 터치 기반 컨트롤 사용
 
-document.getElementById('left-button').addEventListener('touchend', () => {
-    isMovingLeft = false;
-});
-
-document.getElementById('right-button').addEventListener('touchstart', () => {
-    isMovingRight = true;
-});
-
-document.getElementById('right-button').addEventListener('touchend', () => {
-    isMovingRight = false;
-});
-
-document.getElementById('fire-button').addEventListener('touchstart', () => {
-    isShooting = true;
-});
-
-document.getElementById('fire-button').addEventListener('touchend', () => {
-    isShooting = false;
-});
-
-// 모바일 터치 이벤트 방지 - 메뉴 버튼도 예외로 처리
+// 터치 기반 컨트롤 - 터치한 위치로 이동 및 발사
 document.addEventListener('touchstart', (e) => {
-    // 메뉴 버튼 및 컨트롤 버튼은 터치 이벤트를 방지하지 않음
-    if (gameRunning && 
-        e.target.id !== 'left-button' && 
-        e.target.id !== 'right-button' && 
-        e.target.id !== 'fire-button' &&
-        e.target.id !== 'menu-start' &&
-        e.target.id !== 'menu-pause' &&
-        e.target.id !== 'menu-stop') {
+    // 시작 버튼 터치는 별도 처리
+    if (e.target.id === 'start-button') {
+        // 시작 버튼은 기본 클릭 이벤트가 처리하도록 둠
+        return;
+    }
+    
+    // 메뉴 버튼 터치는 무시
+    if (e.target.id === 'menu-start' || e.target.id === 'menu-pause' || e.target.id === 'menu-stop') {
+        e.preventDefault();
+        return;
+    }    // 게임이 실행 중이고 일시정지 상태가 아닐 때만 처리
+    if (gameRunning && !gamePaused) {        // 터치 이벤트에서 X, Y 좌표 계산
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;        // 플레이어 이동
+        if (player) {
+            // 플레이어 중앙이 터치 위치보다 22px 위에 오도록 계산
+            player.x = touchX - (player.width / 2);
+            player.y = touchY - (player.height / 2) - 22; // Y 좌표를 22px 위로 조정
+            
+            // 화면 경계 확인
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > gameWidth) player.x = gameWidth - player.width;
+            if (player.y < 0) player.y = 0;
+            if (player.y + player.height > gameHeight) player.y = gameHeight - player.height;
+            
+            // 총알 발사
+            player.shoot();
+        }
+        
+        // 기본 동작 방지 (스크롤 등)
         e.preventDefault();
     }
 }, { passive: false });
