@@ -107,15 +107,13 @@ class Player {
 
     draw() {
         ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
-    }
-
-    shoot() {
-        if (bulletCooldown <= 0) {
-            bullets.push(new Bullet(this.x + this.width / 2 - 2, this.y));
-            shootSound.currentTime = 0;
-            shootSound.play().catch(e => console.log("오디오 재생 에러:", e));
-            bulletCooldown = isMobile ? 300 : 200; // 발사 쿨다운
-        }
+    }    shoot() {
+        // 쿨다운 체크를 제거하여 호출될 때마다 총알이 발사되도록 함
+        bullets.push(new Bullet(this.x + this.width / 2 - 2, this.y));
+        shootSound.currentTime = 0;
+        shootSound.play().catch(e => console.log("오디오 재생 에러:", e));
+        // 쿨다운을 최소화 (터치가 빠르게 여러 번 발생해도 총알이 나가도록)
+        bulletCooldown = 10;
     }
 }
 
@@ -145,14 +143,13 @@ class Bullet {
 }
 
 // 적 클래스
-class Enemy {
-    constructor(x, y, type) {
+class Enemy {    constructor(x, y, type) {
         this.type = type;
         this.width = type === 1 ? 40 : 50;
         this.height = type === 1 ? 40 : 50;
         this.x = x;
         this.y = y;
-        this.speed = Math.random() * 2 + (type === 1 ? 1 : 0.5);
+        this.speed = (Math.random() * 2 + (type === 1 ? 1 : 0.5)) / 2; // 속도를 절반으로 줄임
         this.img = type === 1 ? enemy1Img : enemy2Img;
         this.movementPattern = Math.floor(Math.random() * 3); // 0: 직선, 1: 지그재그, 2: 곡선
         this.anglePos = 0; // 곡선 이동을 위한 각도 위치
@@ -506,15 +503,16 @@ document.addEventListener('touchstart', (e) => {
             // 플레이어 중앙이 터치 위치보다 22px 위에 오도록 계산
             player.x = touchX - (player.width / 2);
             player.y = touchY - (player.height / 2) - 22; // Y 좌표를 22px 위로 조정
-            
-            // 화면 경계 확인
+              // 화면 경계 확인
             if (player.x < 0) player.x = 0;
             if (player.x + player.width > gameWidth) player.x = gameWidth - player.width;
             if (player.y < 0) player.y = 0;
             if (player.y + player.height > gameHeight) player.y = gameHeight - player.height;
             
-            // 총알 발사
-            player.shoot();
+            // 총알 직접 생성 (쿨다운 무시, 터치할 때마다 즉시 발사)
+            bullets.push(new Bullet(player.x + player.width / 2 - 2, player.y));
+            shootSound.currentTime = 0;
+            shootSound.play().catch(e => console.log("오디오 재생 에러:", e));
         }
         
         // 기본 동작 방지 (스크롤 등)
